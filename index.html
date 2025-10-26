@@ -3,148 +3,38 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title id="pageTitle">eeFood - Khám phá món ăn</title>
-
-    <!-- Open Graph meta (Facebook, Zalo...) -->
-    <meta property="og:type" content="article" />
-    <meta id="ogTitle" property="og:title" content="" />
-    <meta id="ogDesc" property="og:description" content="" />
-    <meta id="ogImg" property="og:image" content="" />
-    <meta id="ogUrl" property="og:url" content="" />
-
-    <!-- Twitter Card meta -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta id="twTitle" name="twitter:title" content="" />
-    <meta id="twDesc" name="twitter:description" content="" />
-    <meta id="twImg" name="twitter:image" content="" />
-
-    <style>
-      body {
-        font-family: system-ui, sans-serif;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 100vh;
-        background: #fffaf8;
-        text-align: center;
-        padding: 16px;
-      }
-
-      img {
-        max-width: 92%;
-        border-radius: 16px;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-        margin-bottom: 1.5rem;
-      }
-
-      h2 {
-        font-size: 1.4rem;
-        margin-bottom: 0.5rem;
-        color: #333;
-      }
-
-      p {
-        color: #666;
-        margin-bottom: 1.5rem;
-        max-width: 420px;
-      }
-
-      button {
-        padding: 12px 20px;
-        border: none;
-        border-radius: 10px;
-        background: #ff7043;
-        color: white;
-        font-size: 16px;
-        cursor: pointer;
-        transition: 0.2s;
-      }
-
-      button:hover {
-        background: #ff8a65;
-      }
-
-      .error {
-        color: #b00020;
-        text-align: center;
-      }
-    </style>
-  </head>
-
-  <body>
-    <div id="previewContainer">
-      <img id="previewImage" alt="eeFood Preview" />
-      <h2 id="previewTitle"></h2>
-      <p id="previewDesc"></p>
-      <button id="openApp">Mở trong ứng dụng</button>
-    </div>
-
-    <div id="errorContainer" style="display: none">
-      <h2 class="error">Không tìm thấy dữ liệu preview 😥</h2>
-      <p>Thiếu tham số hoặc link chia sẻ không hợp lệ.</p>
-    </div>
+    <title>EEFood Share Preview</title>
 
     <script>
-      (function () {
-        const pathMatch = window.location.pathname.match(/\/posts\/(\d+)/);
-        const postId = pathMatch ? pathMatch[1] : null;
+      const params = new URLSearchParams(window.location.search);
+      const title = params.get("title") || "Bài viết EEFood";
+      const desc = params.get("desc") || "Khám phá món ăn hấp dẫn";
+      const img = params.get("img") || "https://eefoods.netlify.app/default.jpg";
 
-        const params = new URLSearchParams(window.location.search);
-        const title = params.get("title");
-        const desc = params.get("desc");
-        const img = params.get("img");
+      // Inject OG tags động
+      document.write(`
+        <meta property="og:title" content="${title}" />
+        <meta property="og:description" content="${desc}" />
+        <meta property="og:image" content="${img}" />
+        <meta property="og:url" content="${window.location.href}" />
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="${title}" />
+        <meta name="twitter:description" content="${desc}" />
+        <meta name="twitter:image" content="${img}" />
+      `);
+    </script>
+  </head>
 
-        if (!postId || !title || !desc || !img) {
-          document.getElementById("previewContainer").style.display = "none";
-          document.getElementById("errorContainer").style.display = "block";
-          return;
-        }
+  <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
+    <h2 id="title"></h2>
+    <img id="img" width="300" style="border-radius:12px;margin-top:12px" />
+    <p id="desc" style="max-width:300px;text-align:center;color:#555"></p>
 
-        const decodedTitle = decodeURIComponent(title);
-        const decodedDesc = decodeURIComponent(desc);
-        const decodedImg = decodeURIComponent(img);
-
-        // Deep link để mở app
-        const deeplink = `eefood://posts/${postId}`;
-        // Fallback URL nếu chưa cài app
-        const fallbackUrl = `https://play.google.com/store/apps/details?id=com.eefood.app`;
-
-        // Cập nhật UI
-        document.title = decodedTitle;
-        document.getElementById("previewTitle").innerText = decodedTitle;
-        document.getElementById("previewDesc").innerText = decodedDesc;
-        document.getElementById("previewImage").src = decodedImg;
-
-        // Cập nhật meta tags để social hiển thị preview
-        const fullUrl = window.location.href;
-        document.getElementById("ogTitle").setAttribute("content", decodedTitle);
-        document.getElementById("ogDesc").setAttribute("content", decodedDesc);
-        document.getElementById("ogImg").setAttribute("content", decodedImg);
-        document.getElementById("ogUrl").setAttribute("content", fullUrl);
-
-        document.getElementById("twTitle").setAttribute("content", decodedTitle);
-        document.getElementById("twDesc").setAttribute("content", decodedDesc);
-        document.getElementById("twImg").setAttribute("content", decodedImg);
-
-        // Nút "Mở trong ứng dụng"
-        document.getElementById("openApp").addEventListener("click", () => {
-          window.location.href = deeplink;
-          setTimeout(() => {
-            window.location.href = fallbackUrl;
-          }, 2000);
-        });
-
-        // Auto deeplink trên mobile
-        if (/android|iphone|ipad/i.test(navigator.userAgent)) {
-          setTimeout(() => {
-            window.location.href = deeplink;
-            setTimeout(() => {
-              window.location.href = fallbackUrl;
-            }, 2000);
-          }, 800);
-        }
-      })();
+    <script>
+      document.getElementById("title").textContent = new URLSearchParams(window.location.search).get("title");
+      document.getElementById("desc").textContent = new URLSearchParams(window.location.search).get("desc");
+      document.getElementById("img").src = new URLSearchParams(window.location.search).get("img");
     </script>
   </body>
 </html>
