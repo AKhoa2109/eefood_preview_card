@@ -1,97 +1,144 @@
 <!DOCTYPE html>
 <html lang="vi">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    
-    <!-- OG Tags mặc định -->
-    <meta property="og:title" content="EEFood - Khám phá ẩm thực" />
-    <meta property="og:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
-    <meta property="og:image" content="https://eefoods.netlify.app/default-og-image.jpg" />
-    <meta property="og:url" content="https://eefoods.netlify.app" />
-    <meta property="og:type" content="website" />
-    
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="EEFood - Khám phá ẩm thực" />
-    <meta name="twitter:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
-    <meta name="twitter:image" content="https://eefoods.netlify.app/default-og-image.jpg" />
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <title>EEFood Share</title>
+  <!-- OG mặc định (sẽ được JS ghi đè khi có query params) -->
+  <meta property="og:title" content="EEFood - Khám phá ẩm thực" />
+  <meta property="og:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
+  <meta property="og:image" content="https://eefoods.netlify.app/default-og-image.jpg" />
+  <meta property="og:url" content="https://eefoods.netlify.app" />
+  <meta property="og:type" content="website" />
 
-    <script>
-      // Lấy tham số từ URL
-      function getUrlParams() {
-        const params = new URLSearchParams(window.location.search);
-        return {
-          title: params.get('title') || 'EEFood - Khám phá ẩm thực',
-          desc: params.get('desc') || 'Khám phá các món ăn hấp dẫn trên EEFood',
-          img: params.get('img') || 'https://eefoods.netlify.app/default-og-image.jpg',
-          postId: window.location.pathname.split('/').pop()
-        };
-      }
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="EEFood - Khám phá ẩm thực" />
+  <meta name="twitter:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
+  <meta name="twitter:image" content="https://eefoods.netlify.app/default-og-image.jpg" />
 
-      // Cập nhật OG tags động
-      function updateMetaTags() {
-        const params = getUrlParams();
-        
-        // Update OG tags
-        document.querySelector('meta[property="og:title"]').setAttribute('content', params.title);
-        document.querySelector('meta[property="og:description"]').setAttribute('content', params.desc);
-        document.querySelector('meta[property="og:image"]').setAttribute('content', params.img);
-        document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
-        
-        // Update Twitter tags
-        document.querySelector('meta[name="twitter:title"]').setAttribute('content', params.title);
-        document.querySelector('meta[name="twitter:description"]').setAttribute('content', params.desc);
-        document.querySelector('meta[name="twitter:image"]').setAttribute('content', params.img);
-        
-        // Update page title
-        document.title = params.title;
-      }
+  <title>EEFood - Chia sẻ bài viết</title>
 
-      // Thử mở app và redirect
-      function tryOpenApp() {
-        const params = getUrlParams();
-        const deepLink = `eefood://posts/${params.postId}`;
-        
-        // Thử mở app
-        window.location.href = deepLink;
-        
-        // Nếu không mở được app sau 2s, redirect về trang chủ hoặc store
+  <style>
+    body {
+      font-family: "Inter", Arial, sans-serif;
+      background-color: #fafafa;
+      color: #333;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .card {
+      max-width: 480px;
+      width: 90%;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+      margin-top: 60px;
+      overflow: hidden;
+      text-align: center;
+    }
+    .card img {
+      width: 100%;
+      height: 240px;
+      object-fit: cover;
+    }
+    .card-content {
+      padding: 20px;
+    }
+    .title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #111;
+    }
+    .desc {
+      font-size: 15px;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    .open-app-btn {
+      display: inline-block;
+      padding: 12px 20px;
+      background-color: #f97316;
+      color: #fff;
+      border-radius: 10px;
+      text-decoration: none;
+      font-weight: 600;
+      transition: background-color 0.2s;
+    }
+    .open-app-btn:hover {
+      background-color: #ea580c;
+    }
+    .footer {
+      font-size: 13px;
+      color: #888;
+      margin-top: 24px;
+    }
+  </style>
+
+  <script>
+    function updateMetaTags() {
+      const urlParams = new URLSearchParams(window.location.search);
+      const pathSegments = window.location.pathname.split('/');
+      const postId = pathSegments[pathSegments.length - 1];
+
+      const title = decodeURIComponent(urlParams.get('title') || 'EEFood - Khám phá ẩm thực');
+      const desc = decodeURIComponent(urlParams.get('desc') || 'Khám phá các món ăn hấp dẫn trên EEFood');
+      const img = decodeURIComponent(urlParams.get('img') || 'https://eefoods.netlify.app/default-og-image.jpg');
+
+      // Cập nhật OG meta cho preview
+      document.querySelector('meta[property="og:title"]').content = title;
+      document.querySelector('meta[property="og:description"]').content = desc;
+      document.querySelector('meta[property="og:image"]').content = img;
+      document.querySelector('meta[property="og:url"]').content = window.location.href;
+
+      document.querySelector('meta[name="twitter:title"]').content = title;
+      document.querySelector('meta[name="twitter:description"]').content = desc;
+      document.querySelector('meta[name="twitter:image"]').content = img;
+
+      document.title = title;
+
+      // Hiển thị thông tin bài viết
+      document.getElementById('preview-img').src = img;
+      document.getElementById('preview-title').innerText = title;
+      document.getElementById('preview-desc').innerText = desc;
+
+      // Nút mở app
+      const deepLink = `eefood://post/${postId}`;
+      const openAppBtn = document.getElementById('open-app-btn');
+      openAppBtn.href = deepLink;
+
+      // Redirect tự động
+      if (postId && postId !== 'posts') {
         setTimeout(() => {
-          window.location.href = 'https://play.google.com/store/apps/details?id=com.yourapp.package';
+          window.location.href = deepLink;
+        }, 800);
+
+        // Fallback nếu không có app
+        setTimeout(() => {
+          window.location.href = 'https://play.google.com/store/apps/details?id=com.eefood.app';
         }, 2000);
       }
+    }
 
-      // Khởi chạy khi trang load
-      document.addEventListener('DOMContentLoaded', function() {
-        updateMetaTags();
-        tryOpenApp();
-      });
-    </script>
-  </head>
-
-  <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;">
-    <div style="text-align:center;padding:20px;">
-      <h2 id="title" style="margin-bottom:16px;">Đang chuyển hướng đến EEFood...</h2>
-      <img id="img" width="300" style="border-radius:12px;margin-bottom:16px;" />
-      <p id="desc" style="max-width:400px;text-align:center;color:#555;line-height:1.5;"></p>
-      <p style="margin-top:20px;color:#888;">
-        Nếu không tự động chuyển hướng, 
-        <a href="#" id="manualRedirect" style="color:#007bff;">nhấn vào đây</a>
-      </p>
+    document.addEventListener('DOMContentLoaded', updateMetaTags);
+  </script>
+</head>
+<body>
+  <div class="card">
+    <img id="preview-img" src="https://eefoods.netlify.app/default-og-image.jpg" alt="preview image" />
+    <div class="card-content">
+      <h2 id="preview-title" class="title">EEFood - Khám phá ẩm thực</h2>
+      <p id="preview-desc" class="desc">Khám phá các món ăn hấp dẫn trên EEFood</p>
+      <a id="open-app-btn" class="open-app-btn" href="#">Mở trong ứng dụng</a>
     </div>
+  </div>
 
-    <script>
-      // Hiển thị thông tin bài viết
-      const params = getUrlParams();
-      document.getElementById("title").textContent = params.title;
-      document.getElementById("desc").textContent = params.desc;
-      document.getElementById("img").src = params.img;
-      
-      // Manual redirect
-      document.getElementById("manualRedirect").href = `eefood://posts/${params.postId}`;
-    </script>
-  </body>
+  <div class="footer">
+    © 2025 EEFood — Chia sẻ hương vị Việt
+  </div>
+</body>
 </html>
