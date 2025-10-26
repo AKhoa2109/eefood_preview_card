@@ -3,15 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title id="pageTitle">eeFood Share Preview</title>
+    <title id="pageTitle">eeFood - Khám phá món ăn</title>
 
-    <!-- Dynamic meta for social -->
+    <!-- Open Graph meta (Facebook, Zalo...) -->
     <meta property="og:type" content="article" />
     <meta id="ogTitle" property="og:title" content="" />
     <meta id="ogDesc" property="og:description" content="" />
     <meta id="ogImg" property="og:image" content="" />
     <meta id="ogUrl" property="og:url" content="" />
 
+    <!-- Twitter Card meta -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta id="twTitle" name="twitter:title" content="" />
     <meta id="twDesc" name="twitter:description" content="" />
@@ -46,7 +47,7 @@
       p {
         color: #666;
         margin-bottom: 1.5rem;
-        max-width: 400px;
+        max-width: 420px;
       }
 
       button {
@@ -86,16 +87,15 @@
 
     <script>
       (function () {
-        // Lấy id từ path (/posts/:id)
         const pathMatch = window.location.pathname.match(/\/posts\/(\d+)/);
-        const id = pathMatch ? pathMatch[1] : new URLSearchParams(window.location.search).get("id");
+        const postId = pathMatch ? pathMatch[1] : null;
 
         const params = new URLSearchParams(window.location.search);
         const title = params.get("title");
         const desc = params.get("desc");
         const img = params.get("img");
 
-        if (!id || !title || !desc || !img) {
+        if (!postId || !title || !desc || !img) {
           document.getElementById("previewContainer").style.display = "none";
           document.getElementById("errorContainer").style.display = "block";
           return;
@@ -105,37 +105,44 @@
         const decodedDesc = decodeURIComponent(desc);
         const decodedImg = decodeURIComponent(img);
 
-        const deeplink = `eefood://posts/${id}`;
-        const fallbackUrl = `https://play.google.com/store/apps/details?id=com.canva.editor`;
+        // Deep link để mở app
+        const deeplink = `eefood://posts/${postId}`;
+        // Fallback URL nếu chưa cài app
+        const fallbackUrl = `https://play.google.com/store/apps/details?id=com.eefood.app`;
 
-        // Update UI
+        // Cập nhật UI
         document.title = decodedTitle;
         document.getElementById("previewTitle").innerText = decodedTitle;
         document.getElementById("previewDesc").innerText = decodedDesc;
         document.getElementById("previewImage").src = decodedImg;
 
-        // Update meta
+        // Cập nhật meta tags để social hiển thị preview
+        const fullUrl = window.location.href;
         document.getElementById("ogTitle").setAttribute("content", decodedTitle);
         document.getElementById("ogDesc").setAttribute("content", decodedDesc);
         document.getElementById("ogImg").setAttribute("content", decodedImg);
-        document.getElementById("ogUrl").setAttribute("content", window.location.href);
+        document.getElementById("ogUrl").setAttribute("content", fullUrl);
 
         document.getElementById("twTitle").setAttribute("content", decodedTitle);
         document.getElementById("twDesc").setAttribute("content", decodedDesc);
         document.getElementById("twImg").setAttribute("content", decodedImg);
 
-        // Button click → mở app
+        // Nút "Mở trong ứng dụng"
         document.getElementById("openApp").addEventListener("click", () => {
           window.location.href = deeplink;
-          setTimeout(() => (window.location.href = fallbackUrl), 2000);
+          setTimeout(() => {
+            window.location.href = fallbackUrl;
+          }, 2000);
         });
 
-        // Auto deeplink nếu trên mobile
+        // Auto deeplink trên mobile
         if (/android|iphone|ipad/i.test(navigator.userAgent)) {
           setTimeout(() => {
             window.location.href = deeplink;
-            setTimeout(() => (window.location.href = fallbackUrl), 2000);
-          }, 600);
+            setTimeout(() => {
+              window.location.href = fallbackUrl;
+            }, 2000);
+          }, 800);
         }
       })();
     </script>
