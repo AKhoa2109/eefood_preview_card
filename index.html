@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title id="pageTitle">eeFood Share Preview</title>
+
+    <!-- Dynamic meta for social -->
+    <meta property="og:type" content="article" />
+    <meta id="ogTitle" property="og:title" content="" />
+    <meta id="ogDesc" property="og:description" content="" />
+    <meta id="ogImg" property="og:image" content="" />
+    <meta id="ogUrl" property="og:url" content="" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta id="twTitle" name="twitter:title" content="" />
+    <meta id="twDesc" name="twitter:description" content="" />
+    <meta id="twImg" name="twitter:image" content="" />
+
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        min-height: 100vh;
+        background: #fffaf8;
+        text-align: center;
+        padding: 16px;
+      }
+
+      img {
+        max-width: 92%;
+        border-radius: 16px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        margin-bottom: 1.5rem;
+      }
+
+      h2 {
+        font-size: 1.4rem;
+        margin-bottom: 0.5rem;
+        color: #333;
+      }
+
+      p {
+        color: #666;
+        margin-bottom: 1.5rem;
+        max-width: 400px;
+      }
+
+      button {
+        padding: 12px 20px;
+        border: none;
+        border-radius: 10px;
+        background: #ff7043;
+        color: white;
+        font-size: 16px;
+        cursor: pointer;
+        transition: 0.2s;
+      }
+
+      button:hover {
+        background: #ff8a65;
+      }
+
+      .error {
+        color: #b00020;
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="previewContainer">
+      <img id="previewImage" alt="eeFood Preview" />
+      <h2 id="previewTitle"></h2>
+      <p id="previewDesc"></p>
+      <button id="openApp">Mở trong ứng dụng</button>
+    </div>
+
+    <div id="errorContainer" style="display: none">
+      <h2 class="error">Không tìm thấy dữ liệu preview 😥</h2>
+      <p>Thiếu tham số hoặc link chia sẻ không hợp lệ.</p>
+    </div>
+
+    <script>
+      (function () {
+        // Lấy id từ path (/posts/:id)
+        const pathMatch = window.location.pathname.match(/\/posts\/(\d+)/);
+        const id = pathMatch ? pathMatch[1] : new URLSearchParams(window.location.search).get("id");
+
+        const params = new URLSearchParams(window.location.search);
+        const title = params.get("title");
+        const desc = params.get("desc");
+        const img = params.get("img");
+
+        if (!id || !title || !desc || !img) {
+          document.getElementById("previewContainer").style.display = "none";
+          document.getElementById("errorContainer").style.display = "block";
+          return;
+        }
+
+        const decodedTitle = decodeURIComponent(title);
+        const decodedDesc = decodeURIComponent(desc);
+        const decodedImg = decodeURIComponent(img);
+
+        const deeplink = `eefood://posts/${id}`;
+        const fallbackUrl = `https://play.google.com/store/apps/details?id=com.canva.editor`;
+
+        // Update UI
+        document.title = decodedTitle;
+        document.getElementById("previewTitle").innerText = decodedTitle;
+        document.getElementById("previewDesc").innerText = decodedDesc;
+        document.getElementById("previewImage").src = decodedImg;
+
+        // Update meta
+        document.getElementById("ogTitle").setAttribute("content", decodedTitle);
+        document.getElementById("ogDesc").setAttribute("content", decodedDesc);
+        document.getElementById("ogImg").setAttribute("content", decodedImg);
+        document.getElementById("ogUrl").setAttribute("content", window.location.href);
+
+        document.getElementById("twTitle").setAttribute("content", decodedTitle);
+        document.getElementById("twDesc").setAttribute("content", decodedDesc);
+        document.getElementById("twImg").setAttribute("content", decodedImg);
+
+        // Button click → mở app
+        document.getElementById("openApp").addEventListener("click", () => {
+          window.location.href = deeplink;
+          setTimeout(() => (window.location.href = fallbackUrl), 2000);
+        });
+
+        // Auto deeplink nếu trên mobile
+        if (/android|iphone|ipad/i.test(navigator.userAgent)) {
+          setTimeout(() => {
+            window.location.href = deeplink;
+            setTimeout(() => (window.location.href = fallbackUrl), 2000);
+          }, 600);
+        }
+      })();
+    </script>
+  </body>
+</html>
