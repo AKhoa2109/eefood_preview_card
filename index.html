@@ -8,7 +8,7 @@
   <meta property="og:title" content="EEFood - Khám phá ẩm thực" />
   <meta property="og:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
   <meta property="og:image" content="logoEEFood.JPG" />
-  <meta property="og:url" content="https://eefoods.netlify.app" />
+  <meta property="og:url" content="https://eefood-preview-card.vercel.app/" />
   <meta property="og:type" content="website" />
 
   <meta name="twitter:card" content="summary_large_image" />
@@ -89,7 +89,7 @@
 
       const title = decodeURIComponent(urlParams.get('title') || 'EEFood - Khám phá ẩm thực');
       const desc = decodeURIComponent(urlParams.get('desc') || 'Khám phá các món ăn hấp dẫn trên EEFood');
-      const img = decodeURIComponent(urlParams.get('img') || 'https://eefoods.netlify.app/default-og-image.jpg');
+      const img = decodeURIComponent(urlParams.get('img') || 'https://eefood-preview-card.vercel.app//default-og-image.jpg');
 
       // Cập nhật OG meta cho preview
       document.querySelector('meta[property="og:title"]').content = title;
