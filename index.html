@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- OG mặc định (sẽ được JS ghi đè khi có query params) -->
+  <!-- OG mặc định -->
   <meta property="og:title" content="EEFood - Khám phá ẩm thực" />
   <meta property="og:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
   <meta property="og:image" content="https://png.pngtree.com/png-clipart/20220317/ourmid/pngtree-a-plate-of-pecel-ayam-lalap-sambal-indonesian-food-illustration-png-image_4497073.png" />
@@ -83,7 +83,9 @@
     function updateMetaTags() {
       const urlParams = new URLSearchParams(window.location.search);
       const pathSegments = window.location.pathname.split('/');
-      const postId = pathSegments[pathSegments.length - 1];
+      
+      // Lấy recipeId từ URL: /posts/123 → recipeId = 123
+      const recipeId = pathSegments[pathSegments.length - 1];
 
       const title = decodeURIComponent(urlParams.get('title') || 'EEFood - Khám phá ẩm thực');
       const desc = decodeURIComponent(urlParams.get('desc') || 'Khám phá các món ăn hấp dẫn trên EEFood');
@@ -106,16 +108,16 @@
       document.getElementById('preview-title').innerText = title;
       document.getElementById('preview-desc').innerText = desc;
 
-      // Nút mở app
-      const deepLink = `eefood://posts/${postId}`;
+      // Tạo deep link với recipeId
+      const deepLink = `eefood://posts/${recipeId}`;
       const openAppBtn = document.getElementById('open-app-btn');
       openAppBtn.href = deepLink;
 
-      // Redirect tự động
-      if (postId && postId !== 'posts') {
+      // Redirect tự động đến app
+      if (recipeId && recipeId !== 'posts') {
         setTimeout(() => {
           window.location.href = deepLink;
-        }, 800);
+        }, 1000); // Redirect sau 1 giây
       }
     }
 
