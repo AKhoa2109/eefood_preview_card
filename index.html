@@ -3,38 +3,95 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>EEFood Share Preview</title>
+    
+    <!-- OG Tags mặc định -->
+    <meta property="og:title" content="EEFood - Khám phá ẩm thực" />
+    <meta property="og:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
+    <meta property="og:image" content="https://eefoods.netlify.app/default-og-image.jpg" />
+    <meta property="og:url" content="https://eefoods.netlify.app" />
+    <meta property="og:type" content="website" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="EEFood - Khám phá ẩm thực" />
+    <meta name="twitter:description" content="Khám phá các món ăn hấp dẫn trên EEFood" />
+    <meta name="twitter:image" content="https://eefoods.netlify.app/default-og-image.jpg" />
+
+    <title>EEFood Share</title>
 
     <script>
-      const params = new URLSearchParams(window.location.search);
-      const title = params.get("title") || "Bài viết EEFood";
-      const desc = params.get("desc") || "Khám phá món ăn hấp dẫn";
-      const img = params.get("img") || "https://eefoods.netlify.app/default.jpg";
+      // Lấy tham số từ URL
+      function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+          title: params.get('title') || 'EEFood - Khám phá ẩm thực',
+          desc: params.get('desc') || 'Khám phá các món ăn hấp dẫn trên EEFood',
+          img: params.get('img') || 'https://eefoods.netlify.app/default-og-image.jpg',
+          postId: window.location.pathname.split('/').pop()
+        };
+      }
 
-      // Inject OG tags động
-      document.write(`
-        <meta property="og:title" content="${title}" />
-        <meta property="og:description" content="${desc}" />
-        <meta property="og:image" content="${img}" />
-        <meta property="og:url" content="${window.location.href}" />
-        <meta property="og:type" content="website" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="${title}" />
-        <meta name="twitter:description" content="${desc}" />
-        <meta name="twitter:image" content="${img}" />
-      `);
+      // Cập nhật OG tags động
+      function updateMetaTags() {
+        const params = getUrlParams();
+        
+        // Update OG tags
+        document.querySelector('meta[property="og:title"]').setAttribute('content', params.title);
+        document.querySelector('meta[property="og:description"]').setAttribute('content', params.desc);
+        document.querySelector('meta[property="og:image"]').setAttribute('content', params.img);
+        document.querySelector('meta[property="og:url"]').setAttribute('content', window.location.href);
+        
+        // Update Twitter tags
+        document.querySelector('meta[name="twitter:title"]').setAttribute('content', params.title);
+        document.querySelector('meta[name="twitter:description"]').setAttribute('content', params.desc);
+        document.querySelector('meta[name="twitter:image"]').setAttribute('content', params.img);
+        
+        // Update page title
+        document.title = params.title;
+      }
+
+      // Thử mở app và redirect
+      function tryOpenApp() {
+        const params = getUrlParams();
+        const deepLink = `eefood://posts/${params.postId}`;
+        
+        // Thử mở app
+        window.location.href = deepLink;
+        
+        // Nếu không mở được app sau 2s, redirect về trang chủ hoặc store
+        setTimeout(() => {
+          window.location.href = 'https://play.google.com/store/apps/details?id=com.yourapp.package';
+        }, 2000);
+      }
+
+      // Khởi chạy khi trang load
+      document.addEventListener('DOMContentLoaded', function() {
+        updateMetaTags();
+        tryOpenApp();
+      });
     </script>
   </head>
 
-  <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;">
-    <h2 id="title"></h2>
-    <img id="img" width="300" style="border-radius:12px;margin-top:12px" />
-    <p id="desc" style="max-width:300px;text-align:center;color:#555"></p>
+  <body style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:Arial,sans-serif;">
+    <div style="text-align:center;padding:20px;">
+      <h2 id="title" style="margin-bottom:16px;">Đang chuyển hướng đến EEFood...</h2>
+      <img id="img" width="300" style="border-radius:12px;margin-bottom:16px;" />
+      <p id="desc" style="max-width:400px;text-align:center;color:#555;line-height:1.5;"></p>
+      <p style="margin-top:20px;color:#888;">
+        Nếu không tự động chuyển hướng, 
+        <a href="#" id="manualRedirect" style="color:#007bff;">nhấn vào đây</a>
+      </p>
+    </div>
 
     <script>
-      document.getElementById("title").textContent = new URLSearchParams(window.location.search).get("title");
-      document.getElementById("desc").textContent = new URLSearchParams(window.location.search).get("desc");
-      document.getElementById("img").src = new URLSearchParams(window.location.search).get("img");
+      // Hiển thị thông tin bài viết
+      const params = getUrlParams();
+      document.getElementById("title").textContent = params.title;
+      document.getElementById("desc").textContent = params.desc;
+      document.getElementById("img").src = params.img;
+      
+      // Manual redirect
+      document.getElementById("manualRedirect").href = `eefood://posts/${params.postId}`;
     </script>
   </body>
 </html>
